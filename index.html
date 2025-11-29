@@ -1,0 +1,1356 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔨 Casse le Coffre au Trésor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      padding: 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(10, 15, 30, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+      border: 2px solid rgba(184, 134, 11, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .game-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b);
+      border-radius: 22px;
+      z-index: -1;
+      animation: borderGlow 3s linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes borderGlow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      background: linear-gradient(45deg, #ffd700, #daa520, #b8860b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .squirrel-logo {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 15px;
+      background-image: url('https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f43f.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+      animation: squirrelBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes squirrelBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-5px) scale(1.05); }
+    }
+
+    .difficulty-selector {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .difficulty-btn {
+      width: 90px;
+      height: 90px;
+      border-radius: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      font-size: 14px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      animation: floatButton 3s ease-in-out infinite;
+    }
+
+    @keyframes floatButton {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.05); }
+    }
+
+    .difficulty-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+    }
+
+    .difficulty-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px) scale(1.08);
+    }
+
+    .difficulty-btn.active {
+      border-color: white;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .instructions {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(184, 134, 11, 0.3);
+    }
+
+    .instructions h2 {
+      font-size: 1.4em;
+      margin-bottom: 8px;
+      background: linear-gradient(45deg, #ffd700, #daa520);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .instructions p {
+      font-size: 1em;
+      font-weight: bold;
+      color: white;
+    }
+
+    .treasure-container {
+      position: relative;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 200px;
+      perspective: 1000px;
+    }
+
+    .treasure-chest {
+      width: 200px;
+      height: 150px;
+      margin: 0 auto;
+      background-image: url('https://i.gifer.com/Imiq.gif');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: relative;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) brightness(1.2) contrast(1.1);
+      z-index: 5;
+    }
+
+    .treasure-chest.easy {
+      filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.7)) brightness(1.1);
+    }
+
+    .treasure-chest.medium {
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) brightness(1.1) hue-rotate(15deg);
+    }
+
+    .treasure-chest.hard {
+      filter: drop-shadow(0 0 25px rgba(255, 0, 0, 0.8)) brightness(1.1) hue-rotate(330deg);
+      animation: redGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes redGlow {
+      0% { filter: drop-shadow(0 0 25px rgba(255, 0, 0, 0.8)) brightness(1.1) hue-rotate(330deg); }
+      100% { filter: drop-shadow(0 0 35px rgba(255, 50, 50, 1)) brightness(1.3) hue-rotate(320deg); }
+    }
+
+    .treasure-chest.hit {
+      animation: lightHit 0.4s ease-out;
+    }
+
+    .treasure-chest.heavy-hit {
+      animation: heavyHit 0.6s ease-out;
+    }
+
+    .treasure-chest.critical-hit {
+      animation: criticalHit 0.8s ease-out;
+    }
+
+    .treasure-chest.mega-hit {
+      animation: megaHit 1.2s ease-out;
+    }
+
+    .treasure-chest.ultra-hit {
+      animation: ultraHit 1.5s ease-out;
+    }
+
+    .treasure-chest.cracked {
+      filter: brightness(0.7) drop-shadow(0 0 15px rgba(255, 0, 0, 0.8));
+      animation: redPulse 1s infinite;
+    }
+
+    .treasure-chest.broken {
+      opacity: 0.3;
+      filter: grayscale(100%) brightness(0.3);
+      animation: knockout 1.5s ease-out forwards;
+    }
+
+    .attack-modes {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .attack-mode-image {
+      width: 110px;
+      height: 110px;
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      position: relative;
+      animation: floatAttack 2.5s ease-in-out infinite;
+    }
+
+    @keyframes floatAttack {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-6px) scale(1.03); }
+    }
+
+    .attack-mode-image:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .attack-mode-image:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .attack-mode-image:nth-child(4) {
+      animation-delay: 0.6s;
+    }
+
+    .attack-mode-image:nth-child(5) {
+      animation-delay: 0.8s;
+    }
+
+    .attack-mode-image:nth-child(6) {
+      animation-delay: 1s;
+    }
+
+    .attack-mode-image:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px) scale(1.08);
+    }
+
+    .attack-mode-image.active {
+      border-color: #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .attack-mode-image img {
+      width: 65px;
+      height: 65px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+
+    .attack-mode-label {
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: bold;
+      color: #feca57;
+      text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .hammer {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      font-size: 2.5em;
+      z-index: 10;
+      top: -30px;
+      right: -15px;
+      transform-origin: bottom center;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .hammer.hitting {
+      animation: hammerHit 0.4s ease-out;
+    }
+
+    @keyframes hammerHit {
+      0% { transform: rotate(0deg) translateY(0); }
+      50% { transform: rotate(-45deg) translateY(15px); }
+      100% { transform: rotate(0deg) translateY(0); }
+    }
+
+    @keyframes lightHit {
+      0% { transform: translateY(0) scale(1); }
+      25% { transform: translateY(-5px) scale(0.95); }
+      50% { transform: translateY(3px) scale(1.02); }
+      75% { transform: translateY(-2px) scale(0.98); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes heavyHit {
+      0% { transform: translateY(0) scale(1); }
+      20% { transform: translateY(-8px) scale(0.9); }
+      40% { transform: translateY(5px) scale(1.05); }
+      60% { transform: translateY(-3px) scale(0.95); }
+      80% { transform: translateY(2px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes criticalHit {
+      0% { transform: translateY(0) scale(1); }
+      15% { transform: translateY(-12px) scale(0.85); }
+      30% { transform: translateY(8px) scale(1.1); }
+      45% { transform: translateY(-6px) scale(0.9); }
+      60% { transform: translateY(4px) scale(1.05); }
+      75% { transform: translateY(-2px) scale(0.97); }
+      90% { transform: translateY(1px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes megaHit {
+      0% { transform: translateY(0) scale(1); }
+      10% { transform: translateY(-15px) scale(0.8); }
+      20% { transform: translateY(10px) scale(1.15); }
+      30% { transform: translateY(-8px) scale(0.85); }
+      40% { transform: translateY(6px) scale(1.1); }
+      50% { transform: translateY(-4px) scale(0.9); }
+      60% { transform: translateY(3px) scale(1.05); }
+      70% { transform: translateY(-2px) scale(0.97); }
+      80% { transform: translateY(1px) scale(1.02); }
+      90% { transform: translateY(-0.5px) scale(0.99); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes ultraHit {
+      0% { transform: translateY(0) scale(1); }
+      8% { transform: translateY(-20px) scale(0.7); }
+      16% { transform: translateY(12px) scale(1.2); }
+      24% { transform: translateY(-10px) scale(0.8); }
+      32% { transform: translateY(8px) scale(1.15); }
+      40% { transform: translateY(-6px) scale(0.85); }
+      48% { transform: translateY(5px) scale(1.1); }
+      56% { transform: translateY(-3px) scale(0.9); }
+      64% { transform: translateY(2px) scale(1.05); }
+      72% { transform: translateY(-1px) scale(0.97); }
+      80% { transform: translateY(0.5px) scale(1.02); }
+      88% { transform: translateY(-0.3px) scale(0.99); }
+      96% { transform: translateY(0.1px) scale(1.01); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes knockout {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      30% { transform: translateY(-10px) scale(0.9); opacity: 0.9; }
+      70% { transform: translateY(40px) scale(0.7); opacity: 0.7; }
+      100% { transform: translateY(60px) scale(0.6); opacity: 0.4; }
+    }
+
+    @keyframes redPulse {
+      0%, 100% { filter: brightness(0.7) drop-shadow(0 0 15px rgba(255, 0, 0, 0.8)); }
+      50% { filter: brightness(0.5) drop-shadow(0 0 25px rgba(255, 0, 0, 1)); }
+    }
+
+    .screen-shake {
+      animation: screenShake 0.4s ease-out;
+    }
+
+    .mega-shake {
+      animation: megaShake 0.8s ease-out;
+    }
+
+    .ultra-shake {
+      animation: ultraShake 1.2s ease-out;
+    }
+
+    @keyframes screenShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @keyframes megaShake {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      10% { transform: translateX(-8px) translateY(-3px); }
+      20% { transform: translateX(8px) translateY(3px); }
+      30% { transform: translateX(-6px) translateY(-2px); }
+      40% { transform: translateX(6px) translateY(2px); }
+      50% { transform: translateX(-4px) translateY(-1px); }
+      60% { transform: translateX(4px) translateY(1px); }
+      70% { transform: translateX(-2px) translateY(-0.5px); }
+      80% { transform: translateX(2px) translateY(0.5px); }
+    }
+
+    @keyframes ultraShake {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      5% { transform: translateX(-12px) translateY(-5px); }
+      10% { transform: translateX(12px) translateY(5px); }
+      15% { transform: translateX(-10px) translateY(-4px); }
+      20% { transform: translateX(10px) translateY(4px); }
+      25% { transform: translateX(-8px) translateY(-3px); }
+      30% { transform: translateX(8px) translateY(3px); }
+      35% { transform: translateX(-6px) translateY(-2px); }
+      40% { transform: translateX(6px) translateY(2px); }
+      45% { transform: translateX(-4px) translateY(-1px); }
+      50% { transform: translateX(4px) translateY(1px); }
+      55% { transform: translateX(-3px) translateY(-1px); }
+      60% { transform: translateX(3px) translateY(1px); }
+      65% { transform: translateX(-2px) translateY(-0.5px); }
+      70% { transform: translateX(2px) translateY(0.5px); }
+      75% { transform: translateX(-1px) translateY(-0.2px); }
+      80% { transform: translateX(1px) translateY(0.2px); }
+    }
+
+    .impact-effect {
+      position: absolute;
+      font-size: 2em;
+      pointer-events: none;
+      z-index: 3;
+      animation: impactPop 1s ease-out forwards;
+      opacity: 0;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+    }
+
+    @keyframes impactPop {
+      0% { opacity: 0; transform: scale(0.3) translateY(0); }
+      30% { opacity: 1; transform: scale(1.5) translateY(-15px); }
+      100% { opacity: 0; transform: scale(1) translateY(-50px); }
+    }
+
+    .controls {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(45deg, #b8860b, #daa520);
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(45deg, #daa520, #ffd700);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #resetBtn {
+      background: linear-gradient(45deg, #555, #777);
+    }
+
+    #resetBtn:hover {
+      background: linear-gradient(45deg, #777, #999);
+    }
+
+    #message {
+      margin: 15px 0;
+      font-size: 1em;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      min-height: 25px;
+      color: #daa520;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-content {
+      background: linear-gradient(135deg, rgba(184, 134, 11, 0.95), rgba(218, 165, 32, 0.95));
+      padding: 25px;
+      border-radius: 20px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      transform: scale(0.7);
+      transition: transform 0.4s ease;
+      position: relative;
+    }
+
+    .popup-overlay.active .popup-content {
+      transform: scale(1);
+    }
+
+    .popup-content h3 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .popup-reward-image {
+      width: 140px;
+      height: 140px;
+      margin: 15px auto;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .popup-reward-text {
+      font-size: 1.3em;
+      margin: 15px 0;
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .popup-victory-message {
+      font-size: 1.4em;
+      margin: 15px 0;
+      color: #feca57;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      font-weight: bold;
+    }
+
+    .popup-close-btn {
+      padding: 10px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(45deg, #b8860b, #daa520);
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .popup-close-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(45deg, #daa520, #ffd700);
+    }
+
+    .coins-display {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(45deg, #b8860b, #daa520);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      animation: coinPop 1s ease;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    @keyframes coinPop {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px) scale(0.5);
+      }
+      50% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px) scale(1);
+      }
+    }
+
+    .combo-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(45deg, #b8860b, #daa520);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9em;
+      display: none;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .difficulty-badge {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .difficulty-badge.easy {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+    }
+
+    .difficulty-badge.medium {
+      background: linear-gradient(45deg, #FF9800, #FFC107);
+    }
+
+    .difficulty-badge.hard {
+      background: linear-gradient(45deg, #F44336, #E91E63);
+    }
+
+    @media (min-width: 768px) {
+      .game-container {
+        padding: 30px;
+        max-width: 600px;
+      }
+      
+      h1 {
+        font-size: 2.2em;
+      }
+      
+      .treasure-chest {
+        width: 250px;
+        height: 190px;
+      }
+      
+      .hammer {
+        width: 80px;
+        height: 80px;
+        font-size: 3em;
+        top: -40px;
+        right: -20px;
+      }
+      
+      .controls {
+        flex-direction: row;
+        justify-content: center;
+      }
+      
+      button {
+        padding: 15px 30px;
+      }
+
+      .attack-mode-image {
+        width: 100px;
+        height: 100px;
+      }
+
+      .attack-mode-image img {
+        width: 55px;
+        height: 55px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .attack-modes {
+        gap: 5px;
+        padding: 0 5px;
+      }
+
+      .attack-mode-image {
+        width: 85px;
+        height: 85px;
+      }
+
+      .attack-mode-image img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .attack-mode-label {
+        font-size: 11px;
+      }
+
+      .treasure-chest {
+        width: 180px;
+        height: 135px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="gameContainer">
+    <div class="combo-indicator" id="comboIndicator">COMBO x0</div>
+
+    <h1>🔨 Casse le Coffre au Trésor</h1>
+    <div class="squirrel-logo"></div>
+    
+    <div class="difficulty-selector">
+      <div class="difficulty-btn easy active" data-difficulty="easy">
+        <img src="https://i.ibb.co/qvwVsrg/IMG-6441-Photoroom.png" alt="Niveau Facile">
+      </div>
+      <div class="difficulty-btn medium" data-difficulty="medium">
+        <img src="https://i.ibb.co/nsyhz2MR/IMG-6442-Photoroom.png" alt="Niveau Moyen">
+      </div>
+      <div class="difficulty-btn hard" data-difficulty="hard">
+        <img src="https://i.ibb.co/1fx81v2x/IMG-6443-Photoroom.png" alt="Niveau Difficile">
+      </div>
+    </div>
+    
+    <div class="treasure-container">
+      <div class="treasure-chest easy" id="treasureChest"></div>
+      <div class="hammer" id="hammer">🔨</div>
+    </div>
+
+    <div class="instructions">
+      <h2>🌹 Casse le Coffre au Trésor et Gagne le Cadeau</h2>
+      <p>Un Coup = Un Point de Vie en Moins</p>
+    </div>
+
+    <div class="attack-modes">
+      <div id="mode1" class="attack-mode-image active">
+        <img src="https://i.ibb.co/pjjCCq6L/IMG-6444-Photoroom.png" alt="Rose - 1 coup">
+        <div class="attack-mode-label">1 coup</div>
+      </div>
+      <div id="mode10" class="attack-mode-image">
+        <img src="https://i.ibb.co/7JsBRrCn/IMG-5885.png" alt="Rosa - 10 coups">
+        <div class="attack-mode-label">10 coups</div>
+      </div>
+      <div id="mode30" class="attack-mode-image">
+        <img src="https://i.ibb.co/8DMJ0cxy/IMG-7355-Photoroom.png" alt="Donuts - 30 coups">
+        <div class="attack-mode-label">30 coups</div>
+      </div>
+      <div id="mode100" class="attack-mode-image">
+        <img src="https://i.ibb.co/C5M6DHcS/IMG-7356-Photoroom.png" alt="Coeurs - 100 coups">
+        <div class="attack-mode-label">100 coups</div>
+      </div>
+      <div id="mode500" class="attack-mode-image">
+        <img src="https://i.ibb.co/nNy17WfL/IMG-6065.png" alt="Mini Gun - 500 coups">
+        <div class="attack-mode-label">500 coups</div>
+      </div>
+      <div id="mode1000" class="attack-mode-image">
+        <img src="https://i.ibb.co/JMPfpWV/IMG-5851.png" alt="Galaxie - 1000 coups">
+        <div class="attack-mode-label">1000 coups</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="attackBtn">Frapper (1 coup)</button>
+      <button id="resetBtn">Nouveau Coffre</button>
+    </div>
+
+    <p id="message"></p>
+  </div>
+
+  <div class="popup-overlay" id="victoryPopup">
+    <div class="popup-content">
+      <h3>🎉 Coffre au Trésor Cassé 🎉</h3>
+      <div id="popupRewardImage" class="popup-reward-image"></div>
+      <p id="popupRewardText" class="popup-reward-text"></p>
+      <div id="popupVictoryMessage" class="popup-victory-message"></div>
+      <button class="popup-close-btn" id="closePopupBtn">Continuer</button>
+    </div>
+  </div>
+
+  <script>
+    let maxHP, currentHP, totalHits;
+    let hitsUntilCoin = 4;
+    let attackMode = 1;
+    let rosesEarnedThisGold = 0;
+    let combo = 0;
+    let lastHitTime = 0;
+    let isAttacking = false;
+    let audioContext = null;
+    let currentDifficulty = "easy";
+
+    // Charger les données sauvegardées au démarrage
+    function loadGameData() {
+      const saved = {
+        difficulty: currentDifficulty,
+        attackMode: attackMode
+      };
+      
+      try {
+        const savedDifficulty = saved.difficulty;
+        const savedAttackMode = saved.attackMode;
+        
+        if (savedDifficulty) {
+          currentDifficulty = savedDifficulty;
+        }
+        if (savedAttackMode) {
+          attackMode = savedAttackMode;
+        }
+      } catch (e) {
+        console.log('Pas de sauvegarde trouvée');
+      }
+    }
+
+    // Sauvegarder automatiquement
+    function saveGameData() {
+      // Sauvegarde en mémoire (simulation)
+      // Dans un environnement réel, on utiliserait localStorage
+    }
+
+    const treasureChest = document.getElementById("treasureChest");
+    const hammer = document.getElementById("hammer");
+    const message = document.getElementById("message");
+    const attackBtn = document.getElementById("attackBtn");
+    const gameContainer = document.getElementById("gameContainer");
+    const comboIndicator = document.getElementById("comboIndicator");
+    
+    const victoryPopup = document.getElementById("victoryPopup");
+    const popupRewardImage = document.getElementById("popupRewardImage");
+    const popupRewardText = document.getElementById("popupRewardText");
+    const popupVictoryMessage = document.getElementById("popupVictoryMessage");
+    const closePopupBtn = document.getElementById("closePopupBtn");
+
+    const impactEffects = ["💥", "🔥", "⭐", "💫", "✨", "💢"];
+
+    function initAudioContext() {
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        return audioContext;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function createSound(frequency, duration, type = 'sine', volume = 0.15) {
+      const context = initAudioContext();
+      if (!context) return;
+
+      try {
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        
+        oscillator.frequency.value = frequency;
+        oscillator.type = type;
+        
+        gainNode.gain.setValueAtTime(volume, context.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + duration);
+        
+        oscillator.start(context.currentTime);
+        oscillator.stop(context.currentTime + duration);
+      } catch (e) {
+      }
+    }
+
+    function playHitSound() {
+      createSound(600, 0.1, 'square');
+      setTimeout(() => createSound(300, 0.05, 'triangle'), 50);
+    }
+
+    function playCrackSound() {
+      createSound(150, 0.3, 'sawtooth');
+      setTimeout(() => createSound(100, 0.2, 'sawtooth'), 100);
+    }
+
+    function playBreakSound() {
+      createSound(80, 0.5, 'sawtooth');
+      setTimeout(() => createSound(200, 0.3, 'square'), 100);
+      setTimeout(() => createSound(400, 0.2, 'sine'), 200);
+    }
+
+    function createTreasureShards() {
+      const container = treasureChest.parentElement;
+      
+      for (let i = 0; i < 8; i++) {
+        const shard = document.createElement('div');
+        shard.style.cssText = `
+          position: absolute;
+          width: 10px;
+          height: 6px;
+          background: linear-gradient(45deg, #ffd700, #ffed4a);
+          border-radius: 2px;
+          pointer-events: none;
+          left: 50%;
+          top: 50%;
+          z-index: 1000;
+        `;
+        
+        container.appendChild(shard);
+        
+        const angle = (i / 8) * Math.PI * 2;
+        const distance = 80 + Math.random() * 80;
+        const duration = 600 + Math.random() * 400;
+        
+        shard.animate([
+          {
+            transform: 'translate(-50%, -50%) scale(1)',
+            opacity: 1
+          },
+          {
+            transform: `translate(calc(-50% + ${Math.cos(angle) * distance}px), calc(-50% + ${Math.sin(angle) * distance}px)) scale(0)`,
+            opacity: 0
+          }
+        ], {
+          duration: duration,
+          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }).onfinish = () => shard.remove();
+      }
+    }
+
+    function createHitParticles() {
+      const container = treasureChest.parentElement;
+      
+      for (let i = 0; i < 4; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          background: #ffd700;
+          border-radius: 50%;
+          pointer-events: none;
+          left: ${45 + Math.random() * 10}%;
+          top: ${45 + Math.random() * 10}%;
+          z-index: 999;
+        `;
+        
+        container.appendChild(particle);
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 20 + Math.random() * 20;
+        
+        particle.animate([
+          {
+            transform: 'scale(1)',
+            opacity: 1
+          },
+          {
+            transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`,
+            opacity: 0
+          }
+        ], {
+          duration: 300,
+          easing: 'ease-out'
+        }).onfinish = () => particle.remove();
+      }
+    }
+
+    function createImpactEffect() {
+      const effect = document.createElement('div');
+      effect.className = 'impact-effect';
+      effect.textContent = impactEffects[Math.floor(Math.random() * impactEffects.length)];
+      effect.style.left = (Math.random() * 80 + 10) + '%';
+      effect.style.top = (Math.random() * 60 + 20) + '%';
+      
+      document.querySelector('.treasure-container').appendChild(effect);
+      
+      setTimeout(() => {
+        effect.remove();
+      }, 1000);
+    }
+
+    function updateCombo() {
+      const currentTime = Date.now();
+      if (currentTime - lastHitTime > 2000) {
+        combo = 0;
+      }
+      combo++;
+      lastHitTime = currentTime;
+      
+      if (combo >= 3) {
+        comboIndicator.textContent = `COMBO x${combo}`;
+        comboIndicator.style.display = 'block';
+      }
+    }
+
+    function attack() {
+      if (currentHP <= 0 || isAttacking) return;
+      
+      isAttacking = true;
+      
+      let hits = attackMode;
+      let actualHits = 0;
+      let rosesEarned = 0;
+      let wasCracked = treasureChest.classList.contains('cracked');
+      
+      hammer.classList.add('hitting');
+      playHitSound();
+      createHitParticles();
+      createImpactEffect();
+      updateCombo();
+      
+      let animationType = 'hit';
+      let shakeType = 'screen-shake';
+      let animationDuration = 400;
+      
+      if (attackMode >= 1000) {
+        animationType = 'ultra-hit';
+        shakeType = 'ultra-shake';
+        animationDuration = 1200;
+      } else if (attackMode >= 500) {
+        animationType = 'mega-hit';
+        shakeType = 'mega-shake';
+        animationDuration = 1000;
+      } else if (attackMode >= 100) {
+        animationType = 'critical-hit';
+        shakeType = 'mega-shake';
+        animationDuration = 800;
+      } else if (attackMode >= 10) {
+        animationType = 'heavy-hit';
+        animationDuration = 600;
+      }
+
+      treasureChest.classList.add(animationType);
+      if (shakeType) gameContainer.classList.add(shakeType);
+      
+      for (let i = 0; i < hits && currentHP > 0; i++) {
+        actualHits++;
+        totalHits++;
+        currentHP--;
+
+        hitsUntilCoin--;
+        if (hitsUntilCoin <= 0) {
+          rosesEarnedThisGold++;
+          rosesEarned++;
+          hitsUntilCoin = 4;
+        }
+      }
+      
+      if (rosesEarned > 0) {
+        showRoseGain(rosesEarned);
+      }
+      
+      updateUI();
+      
+      if (!wasCracked && treasureChest.classList.contains('cracked')) {
+        playCrackSound();
+      }
+      
+      setTimeout(() => {
+        treasureChest.classList.remove(animationType);
+        hammer.classList.remove('hitting');
+        if (shakeType) gameContainer.classList.remove(shakeType);
+        isAttacking = false;
+        
+        if (currentHP <= 0) {
+          endGame();
+        }
+      }, animationDuration);
+    }
+
+    function showRoseGain(amount) {
+      const roseDisplay = document.createElement('div');
+      roseDisplay.className = 'coins-display';
+      roseDisplay.textContent = `+${amount} 🌹`;
+      treasureChest.parentElement.appendChild(roseDisplay);
+      
+      setTimeout(() => {
+        roseDisplay.remove();
+      }, 1000);
+    }
+
+    function updateUI() {
+      if (currentHP === 0) {
+        treasureChest.className = "treasure-chest broken " + currentDifficulty;
+        message.textContent = "💥 Le coffre s'est brisé !";
+      } else {
+        if (maxHP - currentHP >= maxHP * 0.7) {
+          treasureChest.classList.add("cracked");
+          message.textContent = "⚠️ Le coffre commence à se fissurer...";
+        } else {
+          treasureChest.classList.remove("cracked");
+          let difficultyName = currentDifficulty === "easy" ? "facile" : 
+                               currentDifficulty === "medium" ? "moyen" : "difficile";
+          message.textContent = `Coffre ${difficultyName} - À tout moment le coffre peut se briser...`;
+        }
+      }
+    }
+
+    function showVictoryPopup() {
+      let rewardText = "";
+      let victoryText = "";
+      let rewardImg = "";
+      
+      switch(currentDifficulty) {
+        case "easy":
+          rewardText = "2250 pièces d'or !";
+          victoryText = "Félicitations ! Tu as découvert un trésor facile !";
+          rewardImg = "https://i.ibb.co/qvwVsrg/IMG-6441-Photoroom.png";
+          break;
+        case "medium":
+          rewardText = "10000 pièces d'or !";
+          victoryText = "Incroyable ! Tu as trouvé un trésor moyen !";
+          rewardImg = "https://i.ibb.co/nsyhz2MR/IMG-6442-Photoroom.png";
+          break;
+        case "hard":
+          rewardText = "50000 pièces d'or !";
+          victoryText = "Victoire totale ! Tu as découvert le trésor difficile !";
+          rewardImg = "https://i.ibb.co/1fx81v2x/IMG-6443-Photoroom.png";
+          break;
+      }
+      
+      popupRewardImage.style.backgroundImage = `url('${rewardImg}')`;
+      
+      popupRewardText.innerHTML = `
+        <div class="difficulty-badge ${currentDifficulty}">NIVEAU ${currentDifficulty.toUpperCase()}</div><br>
+        <strong>RÉCOMPENSE :</strong><br>
+        ${rewardText}
+      `;
+      
+      popupVictoryMessage.textContent = victoryText;
+      
+      victoryPopup.style.display = 'flex';
+      setTimeout(() => {
+        victoryPopup.classList.add('active');
+      }, 10);
+    }
+
+    function closeVictoryPopup() {
+      victoryPopup.classList.remove('active');
+      setTimeout(() => {
+        victoryPopup.style.display = 'none';
+      }, 300);
+    }
+
+    function endGame() {
+      playBreakSound();
+      setTimeout(() => createTreasureShards(), 100);
+      
+      message.textContent = "💥 Félicitations ! Tu as cassé le coffre au trésor ! 🌹✨";
+      
+      setTimeout(() => {
+        showVictoryPopup();
+      }, 500);
+      
+      comboIndicator.style.display = "none";
+    }
+
+    function setAttackMode(mode) {
+      attackMode = mode;
+      
+      document.querySelectorAll('.attack-mode-image').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      const btnEl = document.getElementById(`mode${mode}`);
+      if (btnEl) btnEl.classList.add('active');
+
+      attackBtn.textContent = `Frapper (${mode} coup${mode > 1 ? 's' : ''})`;
+      saveGameData();
+    }
+
+    function setDifficulty(difficulty) {
+      currentDifficulty = difficulty;
+      
+      document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`.difficulty-btn.${difficulty}`).classList.add('active');
+      
+      treasureChest.className = "treasure-chest " + difficulty;
+      
+      saveGameData();
+      initGame();
+    }
+
+    function initGame() {
+      switch(currentDifficulty) {
+        case "easy":
+          maxHP = 10000;
+          break;
+        case "medium":
+          maxHP = 20000;
+          break;
+        case "hard":
+          maxHP = 50000;
+          break;
+      }
+
+      currentHP = maxHP;
+      totalHits = 0;
+      hitsUntilCoin = 4;
+      rosesEarnedThisGold = 0;
+      combo = 0;
+      lastHitTime = 0;
+      isAttacking = false;
+      
+      treasureChest.className = "treasure-chest " + currentDifficulty;
+      message.textContent = `Coffre ${currentDifficulty === "easy" ? "facile" : currentDifficulty === "medium" ? "moyen" : "difficile"} - À tout moment le coffre peut se briser...`;
+      
+      closeVictoryPopup();
+      comboIndicator.style.display = "none";
+    }
+
+    document.getElementById("attackBtn").addEventListener("click", attack);
+    document.getElementById("resetBtn").addEventListener("click", initGame);
+
+    document.getElementById("mode1").addEventListener("click", () => setAttackMode(1));
+    document.getElementById("mode10").addEventListener("click", () => setAttackMode(10));
+    document.getElementById("mode30").addEventListener("click", () => setAttackMode(30));
+    document.getElementById("mode100").addEventListener("click", () => setAttackMode(100));
+    document.getElementById("mode500").addEventListener("click", () => setAttackMode(500));
+    document.getElementById("mode1000").addEventListener("click", () => setAttackMode(1000));
+
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        setDifficulty(this.getAttribute('data-difficulty'));
+      });
+    });
+
+    closePopupBtn.addEventListener('click', closeVictoryPopup);
+
+    victoryPopup.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeVictoryPopup();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (isAttacking) return;
+      
+      switch(e.key) {
+        case ' ':
+        case 'Enter':
+          e.preventDefault();
+          attack();
+          break;
+        case '1':
+          setAttackMode(1);
+          break;
+        case '2':
+          setAttackMode(10);
+          break;
+        case '3':
+          setAttackMode(30);
+          break;
+        case '4':
+          setAttackMode(100);
+          break;
+        case '5':
+          setAttackMode(500);
+          break;
+        case '6':
+          setAttackMode(1000);
+          break;
+        case 'r':
+        case 'R':
+          initGame();
+          break;
+        case 'e':
+        case 'E':
+          setDifficulty('easy');
+          break;
+        case 'm':
+        case 'M':
+          setDifficulty('medium');
+          break;
+        case 'd':
+        case 'D':
+          setDifficulty('hard');
+          break;
+        case 'Escape':
+          closeVictoryPopup();
+          break;
+      }
+    });
+
+    setInterval(() => {
+      const currentTime = Date.now();
+      if (currentTime - lastHitTime > 3000 && combo > 0) {
+        combo = 0;
+        comboIndicator.style.display = "none";
+      }
+    }, 1000);
+
+    // Charger les données sauvegardées
+    loadGameData();
+    
+    // Appliquer la difficulté sauvegardée
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`.difficulty-btn.${currentDifficulty}`).classList.add('active');
+    
+    // Appliquer le mode d'attaque sauvegardé
+    setAttackMode(attackMode);
+
+    initGame();
+  </script>
+</body>
+</html>
